@@ -1,12 +1,6 @@
-The file font.png is adapted from the following fonts and distributed under the [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) license.
-- https://fontstruct.com/fontstructions/show/243645/7_12_serif 
-- https://fontstruct.com/fontstructions/show/413872/7_12_serif_italic
-- https://fontstruct.com/fontstructions/show/413598/7_12_serif_bold
-- https://fontstruct.com/fontstructions/show/466535/7_12_serif_bold_italic
+MIT License
 
-The file table_stringify.lua is adapted from the following: http://lua-users.org/wiki/SaveTableToFile and distributed under the MIT license, the same as Lua itself.
-
-The rest of the code is original and also distributed under the MIT license, printed below.
+Copyright (c) 2026 esmane
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,5 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
