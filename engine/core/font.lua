@@ -62,9 +62,9 @@ local font = {
     offset_y = 0
 }
 
-font.setup = function(self, path, char_w, char_h, char_sp)
+font.setup = function(self, path, char_w, char_h, char_sp, char_add_y)
     self.char_w = char_w + char_sp
-    self.char_h = char_h
+    self.char_h = char_h + char_add_y
     
     self.tex = love.graphics.newImage(path)
     local tex_w

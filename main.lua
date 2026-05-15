@@ -6,9 +6,10 @@ local love_compat = require("love_compat")
 -- font is baked into the game
 local GAME_WIDTH = 640
 local GAME_HEIGHT = 480
-local FONT_CHAR_W = 7
-local FONT_CHAR_H = 12
-local FONT_CHAR_SP = 1
+local FONT_CHAR_W = 8
+local FONT_CHAR_H = 15
+local FONT_ADD_Y = 1
+local FONT_CHAR_SP = 0
 local FONT_PATH = "font.png"
 
 local GAME_FILE = "phil.lua"
@@ -65,7 +66,7 @@ function love.run()
 
     -- frame buffer
     globalWindow:init(GAME_WIDTH, GAME_HEIGHT)
-    globalFont:setup(FONT_PATH, FONT_CHAR_W, FONT_CHAR_H, FONT_CHAR_SP)
+    globalFont:setup(FONT_PATH, FONT_CHAR_W, FONT_CHAR_H, FONT_CHAR_SP, FONT_ADD_Y)
 
     -- maintain a steady frame rate
 	local dt = 0
