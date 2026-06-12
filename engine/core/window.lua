@@ -59,7 +59,7 @@ window.updateScaleFactor = function(self)
     local scale_x = window_w / self.game_width
     local scale_y = window_h / self.game_height
     self.scale_factor = math.min(scale_x, scale_y)
-    if self.config_data.force_int_scale then
+    if self.config_data.force_integer_scale then
         self.scale_factor = math.floor(self.scale_factor)
     end
     
@@ -74,12 +74,16 @@ window.updateScaleFactor = function(self)
     love.graphics.setCanvas()
     love.graphics.clear(0, 0, 0, 0)
     love.graphics.setCanvas(temp_canvas)
+    
+    -- force a mouse position update
+    local x, y = love.mouse.getPosition()
+    love.event.push("mousemoved", x, y)
 end
 
 -- update the scale filter mode
 window.updateScaleType = function(self)
     local scale_type = "linear"
-    if self.config_data.use_nn then
+    if self.config_data.use_nn_scaling then
         scale_type = "nearest"
     end
     self.render_buffer:setFilter(scale_type)
