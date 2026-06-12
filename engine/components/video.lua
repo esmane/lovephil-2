@@ -38,6 +38,7 @@ local createVideo = function(video, x, y, loop, freeze, action)
                         end
                     end
                     ret = self.action
+                    self.action = nil
                 end
             end
         end
