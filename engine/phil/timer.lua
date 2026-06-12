@@ -11,30 +11,30 @@ timer_manager.reset = function(self)
 end
 
 timer_manager.create = function(self, time, action)
-    -- new timer object
-    local new_timer = {
-        time = time,
-        action = action
-    }
-    
     -- iterate over table, find first empty spot
     local first_empty_slot = nil
-    for _, v in ipairs(self.timers) do
-        if v == nil then
-            first_empty_slot = v
+    for i, v in ipairs(self.timers) do
+        if v.action == nil then
+            first_empty_slot = i
             break
         end
     end
     
     -- if we found an empty slot, use it
     if first_empty_slot then
-        self.timers[first_empty_slot] = new_timer
+        self.timers[first_empty_slot].time = time
+        self.timers[first_empty_slot].action = action
         return first_empty_slot
+    else
+        -- new timer object
+        local new_timer = {
+            time = time,
+            action = action
+        }
+        -- otherwise we need to emplace back
+        table.insert(self.timers, new_timer)
+        return #self.timers
     end
-        
-    -- otherwise we need to emplace back
-    table.insert(self.timers, new_timer)
-    return #self.timers
 end
 
 
@@ -45,11 +45,11 @@ end
 
 timer_manager.check = function(self, dt)
     for i, v in ipairs(self.timers) do
-        if v ~= nil then
+        if v.action ~= nil then
             v.time = v.time - dt
             if v.time <= 0 then
                 local action = v.action
-                self.timers[i] = nil    -- in lua, v is a copy
+                self.timers[i].action = nil    -- in lua, v is a copy
                 if action then
                     action()
                 end

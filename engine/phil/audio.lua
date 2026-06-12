@@ -7,13 +7,19 @@ SOUND_TYPE_EFFECT = 1
 SOUND_TYPE_MUSIC = 2
 SOUND_TYPE_AMBIENT = 3
 
+-- disable falloff due to distance.
+-- why? because it allows 3d audio to be disabled (or the engine be ported to a system that doesn't support it)
+-- and all the volumes will remain correct
+-- since the listener location is unable to move, the specific location of each sound doesn't really matter
+-- only it's angle.
+-- volume can be adjusted by adjusting the volume
+love.audio.setDistanceModel("none")
+
 local audioPlayer = {
     enabled = true, -- the audio player is enabled
     vol = {},
     
     channels = {},
-    pos = {0, 0, 0},
-    t_pos = {0, 0, 0},
     ang = {0, 1},
     t_ang = {0, 1}
 }
@@ -203,34 +209,53 @@ audioPlayer.play_layer = function(self, path_list, min_silence, max_silence, cha
             return
         end
         
-        -- kill existing sound if it exists
-        if self:channelType(channel) == CHANNEL_SOUND then
-            self.channels[channel].source:stop()
-        end
-        
         if not vol then
             vol = 1
         end
         
-        self.channels[channel] = {
-            source = nil,     -- create this later
-            ilk = ilk,
-            paused = false,
-            action = nil,     -- layers do not support actions
+        -- if channel is currently empty then we create a new channel
+        local channel_type = self:channelType(channel)
+        if channel_type == CHANNEL_EMPTY then
+            self.channels[channel] = {
+                source = nil,     -- create this later
+                ilk = ilk,
+                paused = false,
+                action = nil,     -- layers do not support actions
+                
+                base_vol = vol,
+                base_loc = location,
+                delay = min_silence,
+                paths = path_list,
+                max_delay = max_silence,
+                min_delay = min_silence,
+                
+                path = nil
+            }
+            -- determine delay
+            self:determineDelay(self.channels[channel])
+        else
+            -- do not create a new channel if we don't have to. we want the currently playing sound to finish out. we just update the parameters of the layer
+            -- if we want to create a layer without allowing the currently playing sound to finish, we must stop the channel before creating the layer on it.
+            -- the game-level audio_zones functions do this when we set the audio zone
+            self.channels[channel].ilk = ilk
+            self.channels[channel].action = nil
+            self.channels[channel].base_vol = vol
+            self.channels[channel].base_loc = location
+            self.channels[channel].paths = path_list
+            self.channels[channel].max_delay = max_silence
+            self.channels[channel].min_delay = min_silence
             
-            base_vol = vol,
-            base_loc = location,
-            delay = min_silence,
-            paths = path_list,
-            max_delay = max_silence,
-            min_delay = min_silence,
-            
-            path = nil
-        }
-        
-        
-        
-        self:determineDelay(self.channels[channel])
+            -- adjust location and levels of currently playing sound if there is one
+            if channel_type == CHANNEL_SOUND then
+                self.channels[channel].source:setVolume(vol * self.vol[self.channels[channel].ilk])
+                if location then
+                    self.channels[channel].source:setPosition(location[1], location[2], location[3])
+                end
+            else
+                -- if we are not an empty channel and we are not playing a sound, we must be a delaying channel. in this instance we stop the delay
+                self:determineDelay(self.channels[channel])
+            end
+        end
     end
 end
 
@@ -269,14 +294,9 @@ end
 
 audioPlayer.check = function(self, dt)
     if self.enabled then
-        self.pos[1] = lerp(self.pos[1], self.t_pos[1], 0.1)
-        self.pos[2] = lerp(self.pos[2], self.t_pos[2], 0.1)
-        self.pos[3] = lerp(self.pos[3], self.t_pos[3], 0.1)
         self.ang[1] = lerp(self.ang[1], self.t_ang[1], 0.1)
         self.ang[2] = lerp(self.ang[2], self.t_ang[2], 0.1)
-        
-        love.audio.setPosition(self.pos[1], self.pos[2], self.pos[3])
-        love.audio.setOrientation(self.pos[1] + self.ang[1], self.pos[2] + self.ang[2], self.pos[3], 0, 0, -1)
+        love.audio.setOrientation(self.ang[1], self.ang[2], 0, 0, 0, -1)
         
         for i = 1, CHANNEL_COUNT do
             if self.channels[i] then
@@ -314,38 +334,19 @@ audioPlayer.check = function(self, dt)
     end
 end
 
-audioPlayer.set_player_position = function(self, location, dir)
-    if location then
-        self.t_pos = location
-    end
-    
-    if dir then
-        if dir == "n" then
-            self.t_ang[1] = 0
-            self.t_ang[2] = 1
-        elseif dir == "s" then
-            self.t_ang[1] = 0
-            self.t_ang[2] = -1
-        elseif dir == "e" then
-            self.t_ang[1] = 1
-            self.t_ang[2] = 0
-        elseif dir == "w" then
-            self.t_ang[1] = -1
-            self.t_ang[2] = 0
-        elseif dir == "ne" then
-            self.t_ang[1] = 1
-            self.t_ang[2] = 1
-        elseif dir == "se" then
-            self.t_ang[1] = 1
-            self.t_ang[2] = -1
-        elseif dir == "nw" then
-            self.t_ang[1] = -1
-            self.t_ang[2] = 1
-        elseif dir == "sw" then
-            self.t_ang[1] = -1
-            self.t_ang[2] = -1
-        end
-    end
+local dir_table = {
+    n  = { 0,  1},
+    ne = { 1,  1},
+    e  = { 1,  0},
+    se = { 1, -1},
+    s  = { 0, -1},
+    sw = {-1, -1},
+    w  = {-1,  0},
+    nw = {-1,  1}
+}    
+
+audioPlayer.set_player_direction = function(self, dir)
+    self.t_ang = dir_table[dir]
 end
 
 audioPlayer.draw = function(self)
@@ -369,6 +370,6 @@ audioPlayer.draw = function(self)
         end
         globalFont:draw(text, x, y)
         y = y + 16
-end
+    end
 end
 return audioPlayer

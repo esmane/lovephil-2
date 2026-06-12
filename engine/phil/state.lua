@@ -12,7 +12,7 @@ local state = {
     is_paused = false,
     is_blocked = false,
     is_debug = false,
-    engine_name = "LovePhil v0.265.1 / LÖVE " .. ver_maj .. "." .. ver_min .. "." .. ver_patch
+    engine_name = "LovePhil v0.266.1 / LÖVE " .. ver_maj .. "." .. ver_min .. "." .. ver_patch
 }
 
 state.set_pause = function(self, v)
