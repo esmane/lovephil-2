@@ -284,6 +284,11 @@ audioPlayer.playRandom = function(self, sound)
     end
     sound.source:play()
     sound.path = to_play
+    
+    -- prevent memory leaks if can't load
+    if not sound.source:isPlaying() then
+        sound = nil
+    end
 end
 
 
