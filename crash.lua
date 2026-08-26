@@ -35,6 +35,8 @@ bsod.fn = function()
 end
 
 bsod.prep = function(msg)
+    love.graphics.setBlendMode("alpha", "alphamultiply")
+    
     msg = tostring(msg)
     if love.audio then love.audio.stop() end
     phil_scene:clear()
