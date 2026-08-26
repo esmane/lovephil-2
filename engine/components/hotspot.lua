@@ -3,7 +3,7 @@ local globalInput = require("engine.core.input")
 -- depends:phil_state
 
 -- an invisible clickable rectangle
-local createHotspot = function(x, y, w, h, hover_action, click_action)
+local createHotspot = function(x, y, w, h, hover_action, click_action, alt_action)
     local new_hotspot = {
         interactive = true,
         x = x,
@@ -12,7 +12,9 @@ local createHotspot = function(x, y, w, h, hover_action, click_action)
         h = h,
         hover_action = hover_action,
         click_action = click_action,
+        alt_action = alt_action,
         pressed = false,
+        alt_pressed = false,
         hovered = false
     }
     
@@ -37,11 +39,24 @@ local createHotspot = function(x, y, w, h, hover_action, click_action)
                 ret = self.click_action
                 self.pressed = false
             end
+            
+            if globalInput.right_clicked then
+                self.alt_pressed = true
+            elseif self.alt_pressed then
+                -- if the pressed flag is true,
+                -- the mouse is inside the hotspot,
+                -- but the button is no longer being pressed,
+                -- that means the button was just released
+                -- and the hotspot was checked
+                ret = self.alt_action
+                self.alt_pressed = false
+            end
         else
             -- if the cursor is no longer in the hotspot,
             -- the hotspot is no longer being pressed,
             -- even if the button is still being held down
             self.pressed = false
+            self.alt_pressed = false
             self.hovered = false
         end
         return ret

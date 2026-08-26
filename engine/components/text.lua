@@ -46,7 +46,8 @@ local createTextLn = function(x, y, color, text)
     return new_text
 end
 
-createTextMulti = function(text, x, y, w, color, align, tbl)
+
+local createTextMulti = function(text, x, y, w, color, align, tbl)
     local line_x = x    -- left align
     local new_string = ""
     local to_append = nil
