@@ -12,6 +12,8 @@ local createScene = function()
     -- a table of all the objects (components) the scene contains
     scene.objects = {}
 
+    -- the table that contains all the scene functions
+    scene.fns = nil
     -- the name of the last loaded scene
     scene.id = nil
     scene.req_break = false
@@ -36,6 +38,11 @@ local createScene = function()
         for _, v in ipairs(self.objects) do
             v:draw()
         end
+    end
+    
+    -- set the table that contains the scenes
+    scene.set_table = function(self, table)
+        self.fns = table
     end
 
     -- functions
@@ -71,7 +78,7 @@ local createScene = function()
         if not fade_time then
             self.id = scene_id
             self:clear()
-            _G[scene_id]()
+            self.fns[scene_id]()
 
             -- collect garabage
             -- after creating the new scene, we clear all of our references to textures
@@ -99,7 +106,7 @@ local createScene = function()
 
     scene.reload = function(self)
         self:clear()
-        _G[self.id]()
+        self.fns[self.id]()
     end
     
     scene.get_id = function(self)
@@ -135,8 +142,8 @@ local createScene = function()
         table.insert(self.objects, components.createPicture(tex, x, y, crop))
     end
 
-    scene.add_hotspot = function(self, x, y, w, h, hover_action, click_action)
-        table.insert(self.objects, components.createHotspot(x, y, w, h, hover_action, click_action))
+    scene.add_hotspot = function(self, x, y, w, h, hover_action, click_action, alt_action)
+        table.insert(self.objects, components.createHotspot(x, y, w, h, hover_action, click_action, alt_action))
     end
     
     scene.add_scrollspot = function(self, x, y, w, h, up_action, down_action)
