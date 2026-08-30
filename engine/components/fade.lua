@@ -26,8 +26,11 @@ fade_fns.fade_in = function(time)
         self.blackness = self.blackness - ((dt * 255) / self.time)
         if self.blackness <= 0 then
             -- the fade is invisible. so make it disappear
-            self = nil
             phil_state:set_blocked(false)
+            
+            -- delete the top index off the scene
+            -- it should be the fade
+            phil_scene:clear(1)
         end
     end
     
