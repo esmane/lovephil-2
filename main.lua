@@ -211,7 +211,7 @@ end
 
 
 function love.load()   
-    if globalFont.tex and phil_scene and globalWindow.render_buffer and love_compat then
+    if globalFont.tex and phil_scene and globalWindow.render_buffer and love_compat and bsod then
         -- if we have these subsystems loaded we can run our own bsod
         love.errorhandler = bsod.new
         love.errhand = bsod.old
