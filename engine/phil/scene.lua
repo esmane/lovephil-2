@@ -6,8 +6,11 @@ local createScene = function()
     local scene = {}
 
     -- a table of all the textures the scene contains
-    -- and videos too
     scene.textures = {}
+    
+    -- the video
+    scene.video = nil
+    scene.video_path = ""
 
     -- a table of all the objects (components) the scene contains
     scene.objects = {}
@@ -164,14 +167,16 @@ local createScene = function()
     end
 
     scene.add_video = function(self, path, x, y, loop, freeze, action)
-        -- load the video
-        local video = self.textures[path]
-        if not video then
-            video = love.graphics.newVideo(path)
-            self.textures[path] = video
+        -- if the currently loaded video is not the video we are trying to load, load the new video
+        if self.video_path ~= path then
+            self.video = love.graphics.newVideo(path)
+            self.video_path = path
+        else
+            -- if the currently loaded video is the video we are trying to load, simply rewind it
+            self.video:rewind()
         end
         
-        table.insert(self.objects, components.createVideo(video, x, y, loop, freeze, action))
+        table.insert(self.objects, components.createVideo(self.video, x, y, loop, freeze, action))
     end
 
     scene.add_empty = function(self)
