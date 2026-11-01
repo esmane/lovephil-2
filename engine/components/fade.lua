@@ -1,6 +1,8 @@
 local love_compat = require("love_compat")
 local globalWindow = require("engine.core.window")
--- depends:phil_state
+
+local phil_state = require("engine.phil.state")
+
 
 -- fade to black and back
 -- time is how long it should take to fade
@@ -9,11 +11,12 @@ local globalWindow = require("engine.core.window")
 -- can either be the scene or the ui
 local fade_fns = {}
 
-fade_fns.fade_in = function(time)
+fade_fns.fade_in = function(time, obj)
     local newFade = {
         time = time,
         w = globalWindow.game_width,
         h = globalWindow.game_height,
+        obj = obj,
         blackness = 255
     }
     
@@ -30,7 +33,7 @@ fade_fns.fade_in = function(time)
             
             -- delete the top index off the scene
             -- it should be the fade
-            phil_scene:clear(1)
+            self.obj:clear(1)
         end
     end
     
@@ -66,7 +69,7 @@ fade_fns.fade_out = function(time, scene_id, obj)
         if self.blackness >= 255 then
             self.blackness = 255
             self.obj:go(self.scene_id)
-            table.insert(self.obj.objects, fade_fns.fade_in(self.time))
+            table.insert(self.obj.objects, fade_fns.fade_in(self.time, self.obj))
         end
     end
     

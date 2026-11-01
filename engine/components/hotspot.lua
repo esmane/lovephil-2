@@ -1,6 +1,7 @@
 local love_compat = require("love_compat")
 local globalInput = require("engine.core.input")
--- depends:phil_state
+
+local phil_state = require("engine.phil.state")
 
 -- an invisible clickable rectangle
 local createHotspot = function(x, y, w, h, hover_action, click_action, alt_action)

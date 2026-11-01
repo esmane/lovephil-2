@@ -1,5 +1,5 @@
 -- a video
--- depends:phil_state
+local phil_state = require("engine.phil.state")
 
 local createVideo = function(video, x, y, loop, freeze, action)
     local new_video = {

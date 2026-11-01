@@ -1,6 +1,7 @@
 local love_compat = require("love_compat")
 local globalInput = require("engine.core.input")
--- depends:phil_state
+
+local phil_state = require("engine.phil.state")
 
 -- an invisible mouse-wheelable rectangle
 local createScrollspot = function(x, y, w, h, up_action, down_action)

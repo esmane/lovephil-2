@@ -1,5 +1,6 @@
 -- wrapper for all the game object components
 local components = {}
+
 components.createVideo = require("engine.components.video")
 components.createPicture = require("engine.components.picture")
 components.createButton = require("engine.components.button")
