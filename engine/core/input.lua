@@ -14,7 +14,7 @@ local input_state = {
     text_input_text = "",
     text_input_enabled = false,
     text_input_pos = 0,
-    text_input_max_len = 72,
+    text_input_max_len = 0,
     text_input_is_submitted = false
 }
 
