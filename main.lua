@@ -14,6 +14,9 @@ local FONT_PATH = "font.png"
 
 local GAME_FILE = "phil.lua"
 
+local FALLBACK_FPS = 60
+local MAX_FPS = 1000    -- if you have a monitor that does more than 1khz, you'll just have to deal with it (or change this number)
+
 
 -- now create the game objects
 -- global state
@@ -30,7 +33,7 @@ phil_ui = createSceneObject()
 
 -- rest of the phil modules
 phil_audio = require("engine.phil.audio")
-phil_state = require("engine.phil.state")    -- depends scene*, audio (this may be a problem techically)
+phil_state = require("engine.phil.state")    -- depends scene, audio
 phil_cursor = require("engine.phil.cursor")
 phil_config = require("engine.phil.config")  -- depends audio
 phil_warp = require("engine.phil.warp")
@@ -38,20 +41,21 @@ phil_timer = require("engine.phil.timer")
 phil_inv = require("engine.phil.inventory")  -- depends cursor
 phil_console = require("engine.phil.console")
 
-
-
 -- custom love crash scene
 local bsod = require("crash")
+
+-- hook scene to state
+phil_state.scene_obj = phil_scene
 
 
 
 -- helper function for loading frame rate
-local function determine_frame_rate(fallback_frame_rate)
+local function determine_frame_rate()
     local _, _, win_flags = love.window.getMode()
     if win_flags.refreshrate > 0 then
-        return win_flags.refreshrate
+        return math.min(win_flags.refreshrate, MAX_FPS)
     end
-    return fallback_frame_rate
+    return FALLBACK_FPS
 end
 
 -- entry point
@@ -72,7 +76,7 @@ function love.run()
 	local dt = 0
     local frame_start_timestamp = 0
     local timestamp_dif = 0
-    local min_dt = 1 / determine_frame_rate(60)
+    local min_dt = 1 / determine_frame_rate()
     
     -- We don't want the first frame's dt to include time taken by love.load.
     love.load()
@@ -113,10 +117,7 @@ function love.run()
         globalWindow:draw()
         
         -- if we are not using vsync, sleep to maintain frame rate
-        if globalWindow.config_data.use_vsync then
-            -- love devs have this for some reason
-            -- love.timer.sleep(0.001)
-        else
+        if not globalWindow.config_data.use_vsync then
             -- so basically we want to see how long it took us to draw the previous frame
             timestamp_dif = love.timer.getTime() - frame_start_timestamp
             -- if it took us less time to draw the frame than we need to take to preserve our frame rate, sleep
@@ -223,12 +224,12 @@ function love.load()
     
     -- fuse the system
     if love.filesystem.isFused() then
-        print("(phil boot) running in fused mode.")
+        print("(lovephil boot) running in fused mode.")
         local success = love.filesystem.mount(love.filesystem.getSourceBaseDirectory(), "")
         if success then
-            print("(phil boot) mounted base path for reading.")
+            print("(lovephil boot) mounted base path for reading.")
         else
-            print("(phil boot) could not mount base path for reading.")
+            print("(lovephil boot) could not mount base path for reading.")
         end
     end
 
@@ -242,7 +243,7 @@ function love.load()
 	if chunk then
         game_scripts = chunk()
 	else
-        print("(phil boot) error loading " .. GAME_FILE .. " file. could not load game!")
+        print("(lovephil boot) error loading " .. GAME_FILE .. " file. could not load game!")
         print(err)
     end
     
@@ -252,11 +253,11 @@ function love.load()
             if chunk then
                 ok, err = pcall(chunk)
                 if not ok then
-                    print("(phil boot) error executing " .. v .. ":")
+                    print("(lovephil boot) error executing " .. v .. ":")
                     print(err)
                 end
             else
-                print("(phil boot) error loading " .. v .. ":")
+                print("(lovephil boot) error loading " .. v .. ":")
                 print(err)
             end
         end
@@ -265,12 +266,12 @@ function love.load()
     if game_start then
         ok, err = pcall(game_start)
         if not ok then
-            print("(phil boot) error executing 'game_start' function!")
+            print("(lovephil boot) error executing 'game_start' function!")
             print(err)
             love.event.quit(1)
         end
     else
-        print("(phil boot) could not find game_start function!")
+        print("(lovephil boot) could not find game_start function!")
         love.event.quit(1)
     end
 end

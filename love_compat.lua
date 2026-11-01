@@ -4,14 +4,10 @@ local love_compat = {}
 
 -- our game always uses 0-255 colors
 -- so if we are running on love 11 or greater we need to convert from 255 to 0-1
-local ver = 0
-local min = 9
-local rev = 0
-
-ver, min, rev, _ = love.getVersion()
+local VER = love.getVersion()
 
 
-if ver > 10 then
+if VER > 10 then
     -- VERSION 11+ COMPAT FUNCTIONS
     -- if on version 11.0 or greater we need to convert color to bytes
     love_compat.colorToBytes = love.math.colorToBytes
@@ -56,6 +52,12 @@ if ver > 10 then
     -- on version 11, there is an update mode function that we should use
     love_compat.updateMode = love.window.updateMode
     
+    
+    -- on version 11+, we need to play videos with a slightly different command
+    love_compat.newVideo = function(path)
+        return love.graphics.newVideo(path, {audio = false})
+    end
+    
 else
     -- VERSION 10 COMPAT FUNCTIONS
     -- on version 0.10, these functions are fine as is
@@ -66,23 +68,25 @@ else
     -- so we have to implement one ourselves
     love_compat.updateMode = function(w, h, flags)
         -- get old flags
-        local old_flags = nil
-        _, _, old_flags = love.window.getMode()
+        local _, _, old_flags = love.window.getMode()
         
         -- reuse already specified flags
-        flags.msaa = old_flags.msaa
-        flags.resizable = old_flags.resizable
-        flags.borderless = old_flags.borderless
-        flags.centered = old_flags.centered
-        flags.display = old_flags.display
-        flags.highdpi = old_flags.highdpi
+        old_flags.fullscreen = flags.fullscreen
+        old_flags.fullscreentype = flags.fullscreentype
+        old_flags.vsync = flags.vsync
+        old_flags.x = nil
+        old_flags.y = nil
         
-        love.window.setMode(w, h, flags)
+        love.window.setMode(w, h, old_flags)
+    end
+    
+    love_compat.newVideo = function(path)
+        return love.graphics.newVideo(path, false)
     end
 end
 
 -- VERSION 11 ONLY FUNCTION
-if ver == 11 then
+if VER == 11 then
     -- on version 11 only, filesystem.exists is depreciated
     -- it is not on 0.10 and 12.0
     -- although the function still exists in version 11 it does cause a depreciated message to appear on the screen which we do not want
