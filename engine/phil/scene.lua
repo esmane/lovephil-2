@@ -1,3 +1,5 @@
+local love_compat = require("love_compat")
+
 local components = require("engine.components.components")
 local createFade = require("engine.components.fade")
 
@@ -159,7 +161,9 @@ local createScene = function()
     end
     
     scene.add_text = function(self, text, x, y, w, color, align)
+        local size = #self.objects
         components.createText(text, x, y, w, color, align, self.objects)
+        return #self.objects - size
     end
     
     scene.add_textinput = function(self, text, x, y, w, color, clear, action)
@@ -169,10 +173,11 @@ local createScene = function()
     scene.add_video = function(self, path, x, y, loop, freeze, action)
         -- if the currently loaded video is not the video we are trying to load, load the new video
         if self.video_path ~= path then
-            self.video = love.graphics.newVideo(path)
+            self.video = love_compat.newVideo(path)
             self.video_path = path
         else
             -- if the currently loaded video is the video we are trying to load, simply rewind it
+            self.video:pause()
             self.video:rewind()
         end
         

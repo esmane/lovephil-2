@@ -1,6 +1,7 @@
--- modifies: phil_audio
 local globalWindow = require("engine.core.window")
 local table_stringify = require("table_stringify")
+
+local phil_audio = require("engine.phil.audio")
 
 local CONFIG_SAVE_NAME = "config.lua"
 

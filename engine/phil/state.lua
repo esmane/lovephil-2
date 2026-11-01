@@ -1,10 +1,8 @@
--- modifies: phil_scene, phil_audio
 local globalInput = require("engine.core.input")
 
-local ver_maj
-local ver_min
-local ver_patch
-ver_maj, ver_min, ver_patch, _ = love.getVersion()
+local phil_audio = require("engine.phil.audio")
+
+local VER_MAJ, VER_MIN, VER_PAT, _ = love.getVersion()
 
 -- implements the phil_state module
 -- module that control the global state
@@ -12,14 +10,19 @@ local state = {
     is_paused = false,
     is_blocked = false,
     is_debug = false,
-    engine_name = "LovePhil v0.269.0 / LÖVE " .. ver_maj .. "." .. ver_min .. "." .. ver_patch
+    engine_name = "LovePhil v0.26B.0 / LÖVE " .. VER_MAJ .. "." .. VER_MIN .. "." .. VER_PAT,
+    
+    -- internal data
+    scene_obj = nil
 }
 
 state.set_pause = function(self, v)
     self.is_paused = v
     if v then
         -- give the videos a chance to pause themselves
-        phil_scene:check(0)
+        if self.scene_obj then
+            self.scene_obj:check(0)
+        end
         phil_audio:pause()
     else
         phil_audio:resume()

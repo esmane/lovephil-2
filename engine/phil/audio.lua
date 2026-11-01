@@ -341,21 +341,10 @@ audioPlayer.check = function(self, dt)
             end
         end
     end
-end
-
-local dir_table = {
-    n  = { 0,  1},
-    ne = { 1,  1},
-    e  = { 1,  0},
-    se = { 1, -1},
-    s  = { 0, -1},
-    sw = {-1, -1},
-    w  = {-1,  0},
-    nw = {-1,  1}
-}    
+end 
 
 audioPlayer.set_player_direction = function(self, dir)
-    self.t_ang = dir_table[dir]
+    self.t_ang = dir
 end
 
 audioPlayer.draw = function(self)
@@ -381,4 +370,5 @@ audioPlayer.draw = function(self)
         y = y + 16
     end
 end
+
 return audioPlayer

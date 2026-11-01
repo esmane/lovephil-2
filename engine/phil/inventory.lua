@@ -1,6 +1,7 @@
--- modifies: phil_cursor
-
 local globalInput = require("engine.core.input")
+
+local phil_cursor = require("engine.phil.cursor")
+
 
 -- implements the phil_inventory module
 -- responsible for drawing the inventory window
@@ -78,7 +79,6 @@ inventory.create_item = function(self, x, y, action, cursor, obtained)
     table.insert(self.items, new_item)
     return #self.items
 end
-
 
 -- deal with items
 inventory.has_item = function(self, item_index)
@@ -185,6 +185,13 @@ inventory.check = function(self, dt)
                 phil_cursor:default(self.noitem_cursor)
             end
         end
+    end
+end
+
+-- execute an item's function
+inventory.do_item = function(self, item_idx)
+    if self.items[item_idx].action then
+        self.items[item_idx].action()
     end
 end
 

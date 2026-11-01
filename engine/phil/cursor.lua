@@ -8,6 +8,7 @@ local cursor_manager = {
     just_set = false
 }
 
+
 -- sets up the cursor manager
 cursor_manager.setup = function(self, path_to_atlas, cursor_w, cursor_h)
     self.atlas_tex = love.graphics.newImage(path_to_atlas)
